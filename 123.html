@@ -1,1 +1,185 @@
-123
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Змейка - Пиксельная игра</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #1a1a1a;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+        }
+        canvas {
+            border: 3px solid #00ff00;
+            background: #000;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        .controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid #00ff00;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        .score {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="score" id="score">Счёт: 0</div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="controls">
+        <button id="startBtn">Начать игру</button>
+        <div style="margin-top: 10px; font-size: 14px;">
+            Управление: стрелки ↑ ↓ ← →
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const startBtn = document.getElementById('startBtn');
+
+        // Настройки игры
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+
+        let snake = [
+            {x: 10, y: 10}
+        ];
+        let food = {};
+        let dx = 0;
+        let dy = 0;
+        let score = 0;
+        let gameRunning = false;
+        let gameLoop;
+
+        // Пиксельный стиль
+        ctx.imageSmoothingEnabled = false;
+
+        // Генерация еды
+        function randomFood() {
+            food = {
+                x: Math.floor(Math.random() * tileCount),
+                y: Math.floor(Math.random() * tileCount)
+            };
+        }
+
+        // Отрисовка игры
+        function drawGame() {
+            // Очистка canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Движение змейки
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            
+            // Проверка столкновений со стенами
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                gameOver();
+                return;
+            }
+
+            // Проверка столкновения с собой
+            for (let segment of snake) {
+                if (head.x === segment.x && head.y === segment.y) {
+                    gameOver();
+                    return;
+                }
+            }
+
+            snake.unshift(head);
+
+            // Поедание еды
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                scoreElement.textContent = `Счёт: ${score}`;
+                randomFood();
+            } else {
+                snake.pop();
+            }
+
+            // Отрисовка еды (красный квадрат)
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+
+            // Отрисовка змейки
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = i === 0 ? '#00ff00' : '#008800'; // Голова ярко-зеленая, тело темнее
+                ctx.fillRect(snake[i].x * gridSize, snake[i].y * gridSize, gridSize - 2, gridSize - 2);
+            }
+        }
+
+        // Обработка нажатий клавиш
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+
+            // Предотвращение разворота в противоположную сторону
+            switch(e.key) {
+                case 'ArrowUp':
+                    if (dy !== 1) { dx = 0; dy = -1; }
+                    break;
+                case 'ArrowDown':
+                    if (dy !== -1) { dx = 0; dy = 1; }
+                    break;
+                case 'ArrowLeft':
+                    if (dx !== 1) { dx = -1; dy = 0; }
+                    break;
+                case 'ArrowRight':
+                    if (dx !== -1) { dx = 1; dy = 0; }
+                    break;
+            }
+        });
+
+        // Старт игры
+        function startGame() {
+            snake = [{x: 10, y: 10}];
+            dx = 0;
+            dy = 0;
+            score = 0;
+            scoreElement.textContent = `Счёт: ${score}`;
+            randomFood();
+            gameRunning = true;
+            startBtn.textContent = 'Игра запущена';
+            startBtn.disabled = true;
+            gameLoop = setInterval(drawGame, 150);
+        }
+
+        // Конец игры
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            startBtn.textContent = 'Начать игру';
+            startBtn.disabled = false;
+            alert(`Игра окончена! Ваш счёт: ${score}`);
+        }
+
+        // Обработчик кнопки
+        startBtn.addEventListener('click', startGame);
+    </script>
+</body>
+</html>
