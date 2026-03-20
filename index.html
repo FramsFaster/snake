@@ -1,185 +1,177 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Змейка - Пиксельная игра</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            background: #1a1a1a;
-            font-family: 'Courier New', monospace;
-            color: #00ff00;
-        }
-        canvas {
-            border: 3px solid #00ff00;
-            background: #000;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-        }
-        .controls {
-            margin: 20px 0;
-            text-align: center;
-        }
-        button {
-            background: #00ff00;
-            color: #000;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            cursor: pointer;
-            border: 2px solid #00ff00;
-            text-transform: uppercase;
-        }
-        button:hover {
-            background: #00cc00;
-        }
-        .score {
-            font-size: 24px;
-            margin: 10px 0;
-        }
-    </style>
-</head>
-<body>
-    <div class="score" id="score">Счёт: 0</div>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <div class="controls">
-        <button id="startBtn">Начать игру</button>
-        <div style="margin-top: 10px; font-size: 14px;">
-            Управление: стрелки ↑ ↓ ← →
-        </div>
-    </div>
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Chocolate</title>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const scoreElement = document.getElementById('score');
-        const startBtn = document.getElementById('startBtn');
+		<link rel="stylesheet" href="css/global.css">
+		<link rel="stylesheet" href="css/media.css">
+	</head>
 
-        // Настройки игры
-        const gridSize = 20;
-        const tileCount = canvas.width / gridSize;
+	<body class="global__body">
+		<aside class="global__aside">
+			<h2 class="global__aside-header">Меню</h2>
 
-        let snake = [
-            {x: 10, y: 10}
-        ];
-        let food = {};
-        let dx = 0;
-        let dy = 0;
-        let score = 0;
-        let gameRunning = false;
-        let gameLoop;
+			<ul class="global__aside-list">
+				<li class="global__aside-list-item">
+					<a class="global__aside-list-item-link"
+					   href="#start">Начало</a>
+				</li>
 
-        // Пиксельный стиль
-        ctx.imageSmoothingEnabled = false;
+				<li class="global__aside-list-item">
+					<a class="global__aside-list-item-link"
+					   href="#types">Виды углеводов</a>
+				</li>
 
-        // Генерация еды
-        function randomFood() {
-            food = {
-                x: Math.floor(Math.random() * tileCount),
-                y: Math.floor(Math.random() * tileCount)
-            };
-        }
+				<li class="global__aside-list-item">
+					<a class="global__aside-list-item-link"
+					   href="#table">Таблица</a>
+				</li>
 
-        // Отрисовка игры
-        function drawGame() {
-            // Очистка canvas
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+				<li class="global__aside-list-item">
+					<a class="global__aside-list-item-link"
+					   href="#end">Конец</a>
+				</li>
+			</ul>
+		</aside>
 
-            // Движение змейки
-            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
-            
-            // Проверка столкновений со стенами
-            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
-                gameOver();
-                return;
-            }
+		<main class="global__main">
+			<a name="start"></a>
 
-            // Проверка столкновения с собой
-            for (let segment of snake) {
-                if (head.x === segment.x && head.y === segment.y) {
-                    gameOver();
-                    return;
-                }
-            }
+			<h1 class="global__main-header">Признаки того, что Вы поглощаете слишком опасные дозы сладкого</h1>
 
-            snake.unshift(head);
+			<p class="global__main-text">
+				Леденцы, пирожные, кремовые торты, цукаты из экзотических фруктов - эти сладости настолько прочно
+				вошли в нашу жизнь, что мы уже не представляем её без очередной порции десерта.
+			</p>
 
-            // Поедание еды
-            if (head.x === food.x && head.y === food.y) {
-                score++;
-                scoreElement.textContent = `Счёт: ${score}`;
-                randomFood();
-            } else {
-                snake.pop();
-            }
+			<p class="global__main-text">
+				Но задумывались ли вы когда-нибудь о вреде сладкого? О том, что сахара портят наши зубы, кожу и
+				органы? Если нет, тогда эта статья для вас. Сегодня мы поговорим о предполагаемом вреде сладких
+				продуктов.
+			</p>
 
-            // Отрисовка еды (красный квадрат)
-            ctx.fillStyle = '#ff0000';
-            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+			<img class="global__main-image"
+			     src="img/tyan.jpg"
+			     alt="девушка с кексом">
 
-            // Отрисовка змейки
-            for (let i = 0; i < snake.length; i++) {
-                ctx.fillStyle = i === 0 ? '#00ff00' : '#008800'; // Голова ярко-зеленая, тело темнее
-                ctx.fillRect(snake[i].x * gridSize, snake[i].y * gridSize, gridSize - 2, gridSize - 2);
-            }
-        }
+			<h2 class="global__main-subheader">Для чего нужны сладости?</h2>
 
-        // Обработка нажатий клавиш
-        document.addEventListener('keydown', (e) => {
-            if (!gameRunning) return;
+			<p class="global__main-text">
+				Еще в школьные годы на уроках биологии нас учили тому, что сладкая еда – источник углеводов. А
+				углеводы – это источник энергии, необходимой для работы человеческого организма. Соответственно,
+				польза сладкого в том, что с его помощью человек получает энергию для своей жизнедеятельности.
+			</p>
 
-            // Предотвращение разворота в противоположную сторону
-            switch(e.key) {
-                case 'ArrowUp':
-                    if (dy !== 1) { dx = 0; dy = -1; }
-                    break;
-                case 'ArrowDown':
-                    if (dy !== -1) { dx = 0; dy = 1; }
-                    break;
-                case 'ArrowLeft':
-                    if (dx !== 1) { dx = -1; dy = 0; }
-                    break;
-                case 'ArrowRight':
-                    if (dx !== -1) { dx = 1; dy = 0; }
-                    break;
-            }
-        });
+			<p class="global__main-text">
+				Из этого следует, что сахара – это полезные вещества? В этом вопросе есть свои нюансы. Для начала
+				стоит разобраться с разновидностями углеводов и их предназначением.
+			</p>
 
-        // Старт игры
-        function startGame() {
-            snake = [{x: 10, y: 10}];
-            dx = 0;
-            dy = 0;
-            score = 0;
-            scoreElement.textContent = `Счёт: ${score}`;
-            randomFood();
-            gameRunning = true;
-            startBtn.textContent = 'Игра запущена';
-            startBtn.disabled = true;
-            gameLoop = setInterval(drawGame, 150);
-        }
+			<a name="types"></a>
 
-        // Конец игры
-        function gameOver() {
-            gameRunning = false;
-            clearInterval(gameLoop);
-            startBtn.textContent = 'Начать игру';
-            startBtn.disabled = false;
-            alert(`Игра окончена! Ваш счёт: ${score}`);
-        }
+			<h3 class="global__main-subheader">Все углеводы можно поделить на два вида.</h3>
 
-        // Обработчик кнопки
-        startBtn.addEventListener('click', startGame);
-    </script>
-</body>
+			<ul class="global__main-list">
+				<li class="global__main-list-item">
+					<dfn>Простые</dfn> – вещества, состоящие из одной или двух молекул сахаров. К моносахарам
+					относят глюкозу, галактозу и фруктозу. К дисахаридам относят сахарозу и лактозу с мальтозой.
+					Простые соединения перевариваются довольно быстро и в кратчайшие сроки насыщают человеческий
+					организм энергией. Такие вещества необходимы спортсменам (в виде сахарозаменителей) для мышечного
+					синтеза гликогена и детям, чтобы обеспечить энергией растущий организм.
+				</li>
+
+				<li class="global__main-list-item">
+					<dfn>Сложные</dfn> – представлены классом полисахаридов. Они состоят из сотен тысяч молекул
+					моносахаров, при попадании в человеческий организм обеспечивают энергией и поддерживают метаболизм.
+				</li>
+			</ul>
+
+			<p class="global__main-text global__main-notice">
+				Иногда в отдельный вид выделяют клетчатку – ее относят к нерастворимым углеводам. Она необходима нашему
+				организму, чтобы насыщать его и регулировать процессы обмена. Содержится в волокнах овощей и фруктов.
+			</p>
+
+			<a name="table"></a>
+
+			<h3 class="global__main-subheader">Рассмотрим пользу и вред всех видов сахаров с помощью таблицы.</h3>
+
+			<table class="global__main-table">
+				<thead>
+					<tr>
+						<th>Вид соединения</th>
+						<th>Польза для человека</th>
+						<th>Возможный вред</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr>
+						<td>Моносахариды</td>
+						<td>
+							Глюкоза является основным элементом всех видов сахаров. Она способствует быстрой доставке
+							питательных веществ к клеткам, регулирует энергетический обмен.
+							<br><br>
+							Галактоза способствует наполнению тканей энергией, что особенно важно для лиц,
+							занимающихся физической активностью. ёТакже она способна приводить к быстрой потере
+							лишнего веса, а для взрослого населения может служить средством профилактики сахарного
+							диабета.
+						</td>
+						<td>
+							Фруктоза может привести к расстройствам пищеварения и увеличению в крови количества липидов.
+						</td>
+					</tr>
+
+					<tr>
+						<td>Дисахариды</td>
+						<td>
+							Повышают работоспособность и способствуют улучшению памяти.
+							<br><br>
+							Поднимают настроение.
+							<br><br>
+							Лактоза улучшает всасывание кальция в кровь.
+							<br><br>
+							Мальтоза помогает всасывать в кровь витамины группы В и аминокислоты.
+						</td>
+						<td>
+							Нарушают обмен веществ, способствуют разрушению зубной эмали.
+							<br><br>
+							В детском возрасте переизбыток дисахаридов может привести к неврозам.
+							<br><br>
+							Лактоза способна спровоцировать сильную аллергию у маленьких детей.
+						</td>
+					</tr>
+
+					<tr>
+						<td>Полисахариды</td>
+						<td>
+							Благодаря тому, что сложные соединения медленно перевариваются в тонком кишечнике,
+							человек дольше чувствует насыщение.
+						</td>
+						<td>
+							Избыток углеводов может привести к лишнему весу.
+						</td>
+					</tr>
+
+					<tr>
+						<td>Клетчатка</td>
+						<td>
+							Благодаря тому, что клетчатка не переваривается организмом, она способствует очищению
+							кишечника от остатков пищи и шлаков.
+						</td>
+						<td>
+							Чрезмерное употребление фруктов и овощей, богатых клетчаткой, может вызвать расстройства
+							пищеварения и нарушение стула.
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<img class="global__main-image"
+			     src="img/dieta.jpeg"
+			     alt="попытка похудеть">
+
+			<a name="end"></a>
+		</main>
+	</body>
 </html>
